@@ -55,6 +55,22 @@ module _ {ℓo}{ℓh}{ℓp} (C : Category ℓo ℓh) (P : Presheaf C ℓp) where
       commutes : ∀ {b} (ϕ : (P ⟅ b ⟆) .fst) → C [ element ∘ᴾ⟨ P ⟩ coinduction ϕ ] ≡ ϕ
       is-uniq : ∀ {b} (ϕ : (P ⟅ b ⟆) .fst) f → (C [ element ∘ᴾ⟨ P ⟩ f ] ≡ ϕ) → f ≡ coinduction ϕ
 
+    determined-by-elt : ∀ {b}
+                      → {f g : C [ b , vertex ]}
+                      → C [ element ∘ᴾ⟨ P ⟩ f ] ≡ C [ element ∘ᴾ⟨ P ⟩ g ]
+                      → f ≡ g
+    determined-by-elt {f = f}{g} ef≡eg =
+      f
+        ≡⟨ is-uniq (C [ element ∘ᴾ⟨ P ⟩ f ]) f refl ⟩
+      coinduction (C [ element ∘ᴾ⟨ P ⟩ f ])
+        ≡[ i ]⟨ coinduction (ef≡eg i) ⟩
+      coinduction (C [ element ∘ᴾ⟨ P ⟩ g ])
+        ≡⟨ sym (is-uniq ((C [ element ∘ᴾ⟨ P ⟩ g ])) g refl) ⟩
+      g ∎
+
+    η-expansion : ∀ {b} (f : C [ b , vertex ]) → f ≡ coinduction (C [ element ∘ᴾ⟨ P ⟩ f ])
+    η-expansion f = is-uniq (C [ element ∘ᴾ⟨ P ⟩ f ]) f refl
+
   record UnivElt : Type (ℓ-max (ℓ-max ℓo ℓh) ℓp) where
     field
       vertex : C .ob
