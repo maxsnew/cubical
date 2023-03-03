@@ -71,6 +71,15 @@ module _ {ℓo}{ℓh}{ℓp} (C : Category ℓo ℓh) (P : Presheaf C ℓp) where
     η-expansion : ∀ {b} (f : C [ b , vertex ]) → f ≡ coinduction (C [ element ∘ᴾ⟨ P ⟩ f ])
     η-expansion f = is-uniq (C [ element ∘ᴾ⟨ P ⟩ f ]) f refl
 
+    coinduction-natural : ∀ {a b} → (ϕ : (P ⟅ b ⟆) .fst) → (f : C [ a , b ])
+                        → coinduction ϕ ∘⟨ C ⟩ f ≡ coinduction (C [ ϕ ∘ᴾ⟨ P ⟩ f ])
+    coinduction-natural ϕ f = is-uniq (C [ ϕ ∘ᴾ⟨ P ⟩ f ]) (coinduction ϕ ∘⟨ C ⟩ f)
+      (C [ element ∘ᴾ⟨ P ⟩ (coinduction ϕ ∘⟨ C ⟩ f) ]
+        ≡⟨ ∘ᴾAssoc C P element (coinduction ϕ) f ⟩
+      C [ C [ element ∘ᴾ⟨ P ⟩ coinduction ϕ ] ∘ᴾ⟨ P ⟩ f ]
+        ≡[ i ]⟨ C [ commutes ϕ i ∘ᴾ⟨ P ⟩ f ] ⟩
+       C [ ϕ ∘ᴾ⟨ P ⟩ f ] ∎)
+
   record UnivElt : Type (ℓ-max (ℓ-max ℓo ℓh) ℓp) where
     field
       vertex : C .ob
