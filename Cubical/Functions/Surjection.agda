@@ -2,6 +2,7 @@
 module Cubical.Functions.Surjection where
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Structure
 open import Cubical.Foundations.Powerset
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Isomorphism
@@ -122,3 +123,31 @@ compSurjection (f , sur-f) (g , sur-g) =
 
         H₂ : {x : A} → f x ≡ g → x ∉ (f x) → x ∈ (f x)
         H₂ {x} fx≡g x∈g = transport (cong (fst ∘ (_$ x)) (sym fx≡g)) x∈g
+
+
+¬Prop : hProp ℓ → hProp ℓ
+¬Prop P = (¬ ⟨ P ⟩) , isProp¬ _
+
+no-¬-fixpoint : ¬ (Fixpoint (¬Prop {ℓ}))
+no-¬-fixpoint (P , ¬P≡P) = PT.rec isProp⊥ fst fixId⊥ where
+  ⟨P⟩≡¬⟨P⟩ = (sym (cong ⟨_⟩ ¬P≡P))
+  P→¬P : ⟨ P ⟩ → ¬ ⟨ P ⟩
+  P→¬P = transport (sym (cong ⟨_⟩ ¬P≡P))
+
+  id⊥ : ⊥ → ⊥
+  id⊥ ()
+
+  fixId⊥ : ∥ Fixpoint id⊥ ∥₁
+  fixId⊥ = ↠Fixpoint {A = ⟨ P ⟩}{B = ⊥}
+    (P→¬P , isEquiv→isSurjection (isEquivTransport ⟨P⟩≡¬⟨P⟩))
+    id⊥
+
+no-¬-fixpoint' : ¬ (Fixpoint (¬_ {ℓ}))
+no-¬-fixpoint' (A , ¬A≡A) = PT.rec isProp⊥ fst
+  (↠Fixpoint {A = A} {B = ⊥} ((transport (sym ¬A≡A)) , (isEquiv→isSurjection (isEquivTransport (sym ¬A≡A)))) (λ z → z))
+
+¬Surjection-into-Powerset' : ∀ {A : Type ℓ} → ¬ (A ↠ ℙ A)
+¬Surjection-into-Powerset' e = PT.rec isProp⊥ no-¬-fixpoint (↠Fixpoint e ¬Prop)
+
+¬Surjection-into-Powertype : ∀ {A : Type ℓ} → ¬ (A ↠ (A → Type ℓ'))
+¬Surjection-into-Powertype e = PT.rec isProp⊥ no-¬-fixpoint' (↠Fixpoint e ¬_)
