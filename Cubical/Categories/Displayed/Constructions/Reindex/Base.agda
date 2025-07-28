@@ -112,8 +112,8 @@ module _
   π : Functorᴰ F reindex Dᴰ
   π .F-obᴰ = λ z → z
   π .F-homᴰ = λ z → z
-  π .F-idᴰ = R.≡out $ sym (R.reind-filler _ _)
-  π .F-seqᴰ fᴰ gᴰ = R.≡out $ sym (R.reind-filler _ _)
+  π .F-idᴰ = R.rectify $ R.≡out $ sym (R.reind-filler _ _)
+  π .F-seqᴰ fᴰ gᴰ = R.rectify $ R.≡out $ sym (R.reind-filler _ _)
 
   GlobalSectionReindex→Section : GlobalSection reindex → Section F Dᴰ
   GlobalSectionReindex→Section Fᴰ = compFunctorᴰGlobalSection π Fᴰ

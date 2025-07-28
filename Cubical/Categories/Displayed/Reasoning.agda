@@ -41,42 +41,43 @@ module Cubical.Categories.Displayed.Reasoning
   -- directly through this module.
   open Category (∫C Cᴰ) public
 
-  -- Shorthand to introduce a displayed equality into the reasoning machine
-  ≡in : {a b : C.ob} {f g : C [ a , b ]}
+  opaque
+    -- Shorthand to introduce a displayed equality into the reasoning machine
+    ≡in : {a b : C.ob} {f g : C [ a , b ]}
+          {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
+          {fᴰ : Hom[ f ][ aᴰ , bᴰ ]}
+          {gᴰ : Hom[ g ][ aᴰ , bᴰ ]}
+          {p : f ≡ g}
+        → (fᴰ ≡[ p ] gᴰ)
+        → (f , fᴰ) ≡ (g , gᴰ)
+    ≡in e = ΣPathP (_ , e)
+
+    -- Shorthand to produce a displayed equality out of the reasoning machine
+    ≡out : {a b : C.ob} {f g : C [ a , b ]}
+           {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
+           {fᴰ : Hom[ f ][ aᴰ , bᴰ ]}
+           {gᴰ : Hom[ g ][ aᴰ , bᴰ ]}
+         → (e : (f , fᴰ) ≡ (g , gᴰ))
+         → (fᴰ ≡[ fst (PathPΣ e) ] gᴰ)
+    ≡out e = snd (PathPΣ e)
+
+    -- Reindexing displayed morphisms along an equality in the base
+    reind : {a b : C.ob} {f g : C [ a , b ]} (p : f ≡ g)
+        {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
+      → Hom[ f ][ aᴰ , bᴰ ] → Hom[ g ][ aᴰ , bᴰ ]
+    reind p = subst Hom[_][ _ , _ ] p
+
+    -- Filler for the above, directly in the reasoning machine
+    reind-filler : {a b : C.ob} {f g : C [ a , b ]} (p : f ≡ g)
+        {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
+        (fᴰ : Hom[ f ][ aᴰ , bᴰ ])
+      → (f , fᴰ) ≡ (g , reind p fᴰ)
+    reind-filler p fᴰ = ΣPathP (p , subst-filler Hom[_][ _ , _ ] p fᴰ)
+
+    -- Rectify the base equality of dependent equalities to whatever we want
+    rectify : {a b : C.ob} {f g : C [ a , b ]} {p p' : f ≡ g}
         {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
         {fᴰ : Hom[ f ][ aᴰ , bᴰ ]}
         {gᴰ : Hom[ g ][ aᴰ , bᴰ ]}
-        {p : f ≡ g}
-      → (fᴰ ≡[ p ] gᴰ)
-      → (f , fᴰ) ≡ (g , gᴰ)
-  ≡in e = ΣPathP (_ , e)
-
-  -- Shorthand to produce a displayed equality out of the reasoning machine
-  ≡out : {a b : C.ob} {f g : C [ a , b ]}
-         {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
-         {fᴰ : Hom[ f ][ aᴰ , bᴰ ]}
-         {gᴰ : Hom[ g ][ aᴰ , bᴰ ]}
-       → (e : (f , fᴰ) ≡ (g , gᴰ))
-       → (fᴰ ≡[ fst (PathPΣ e) ] gᴰ)
-  ≡out e = snd (PathPΣ e)
-
-  -- Reindexing displayed morphisms along an equality in the base
-  reind : {a b : C.ob} {f g : C [ a , b ]} (p : f ≡ g)
-      {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
-    → Hom[ f ][ aᴰ , bᴰ ] → Hom[ g ][ aᴰ , bᴰ ]
-  reind p = subst Hom[_][ _ , _ ] p
-
-  -- Filler for the above, directly in the reasoning machine
-  reind-filler : {a b : C.ob} {f g : C [ a , b ]} (p : f ≡ g)
-      {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
-      (fᴰ : Hom[ f ][ aᴰ , bᴰ ])
-    → (f , fᴰ) ≡ (g , reind p fᴰ)
-  reind-filler p fᴰ = ΣPathP (p , subst-filler Hom[_][ _ , _ ] p fᴰ)
-
-  -- Rectify the base equality of dependent equalities to whatever we want
-  rectify : {a b : C.ob} {f g : C [ a , b ]} {p p' : f ≡ g}
-      {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
-      {fᴰ : Hom[ f ][ aᴰ , bᴰ ]}
-      {gᴰ : Hom[ g ][ aᴰ , bᴰ ]}
-    → fᴰ ≡[ p ] gᴰ → fᴰ ≡[ p' ] gᴰ
-  rectify {fᴰ = fᴰ} {gᴰ = gᴰ} = subst (fᴰ ≡[_] gᴰ) (C.isSetHom _ _ _ _)
+      → fᴰ ≡[ p ] gᴰ → fᴰ ≡[ p' ] gᴰ
+    rectify {fᴰ = fᴰ} {gᴰ = gᴰ} = subst (fᴰ ≡[_] gᴰ) (C.isSetHom _ _ _ _)
