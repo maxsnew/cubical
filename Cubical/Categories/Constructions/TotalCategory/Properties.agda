@@ -119,3 +119,8 @@ module _ {C : Category ℓC ℓC'} {Cᴰ : Categoryᴰ C ℓCᴰ ℓCᴰ'} where
     recᴰ .F-seqᴰ {x} {y} {z} {f} {g} {xᴰ} {yᴰ} {zᴰ} fᴰ gᴰ =
       R.rectify (Fᴰ .F-seqᴰ (f , fᴰ) (g , gᴰ))
 
+  ∫op : Functor (∫C Cᴰ ^op) (∫C (Cᴰ ^opᴰ))
+  ∫op .F-ob = λ z → z
+  ∫op .F-hom = λ z → z
+  ∫op .F-id = refl
+  ∫op .F-seq = λ _ _ → refl

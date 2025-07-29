@@ -81,6 +81,7 @@ module _ {ℓo}{ℓh}{ℓp} (C : Category ℓo ℓh) (P : Presheaf C ℓp) where
   isPropIsUniversal vertex element = isPropΠ (λ _ → isPropIsEquiv _)
 
   record UniversalElement : Type (ℓ-max (ℓ-max ℓo ℓh) ℓp) where
+    no-eta-equality
     field
       vertex : C .ob
       element : (P ⟅ vertex ⟆) .fst

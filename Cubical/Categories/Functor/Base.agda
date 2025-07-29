@@ -143,12 +143,23 @@ funcCompOb≡ : ∀ (G : Functor D E) (F : Functor C D) (c : ob C)
             → funcComp G F .F-ob c ≡ G .F-ob (F .F-ob c)
 funcCompOb≡ G F c = refl
 
-
 _^opF  : Functor C D → Functor (C ^op) (D ^op)
 (F ^opF) .F-ob      = F .F-ob
 (F ^opF) .F-hom     = F .F-hom
 (F ^opF) .F-id      = F .F-id
 (F ^opF) .F-seq f g = F .F-seq g f
+
+elimOp : Functor C (D ^op) → Functor (C ^op) D
+elimOp F .F-ob = F .F-ob
+elimOp F .F-hom = F .F-hom
+elimOp F .F-id = F .F-id
+elimOp F .F-seq = λ f g → F .F-seq g f
+
+introOp : Functor (C ^op) D → Functor C (D ^op)
+introOp F .F-ob = F .F-ob
+introOp F .F-hom = F .F-hom
+introOp F .F-id = F .F-id
+introOp F .F-seq = λ f g → F .F-seq g f
 
 -- open Iso
 -- Iso^opF : Iso (Functor C D) (Functor (C ^op) (D ^op))
