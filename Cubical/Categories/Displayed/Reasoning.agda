@@ -41,6 +41,12 @@ module Cubical.Categories.Displayed.Reasoning
   -- directly through this module.
   open Category (∫C Cᴰ) public
 
+
+  -- Reindexing displayed morphisms along an equality in the base
+  reind : {a b : C.ob} {f g : C [ a , b ]} (p : f ≡ g)
+      {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
+    → Hom[ f ][ aᴰ , bᴰ ] → Hom[ g ][ aᴰ , bᴰ ]
+  reind p = subst Hom[_][ _ , _ ] p
   opaque
     -- Shorthand to introduce a displayed equality into the reasoning machine
     ≡in : {a b : C.ob} {f g : C [ a , b ]}
@@ -60,12 +66,6 @@ module Cubical.Categories.Displayed.Reasoning
          → (e : (f , fᴰ) ≡ (g , gᴰ))
          → (fᴰ ≡[ fst (PathPΣ e) ] gᴰ)
     ≡out e = snd (PathPΣ e)
-
-    -- Reindexing displayed morphisms along an equality in the base
-    reind : {a b : C.ob} {f g : C [ a , b ]} (p : f ≡ g)
-        {aᴰ : ob[ a ]} {bᴰ : ob[ b ]}
-      → Hom[ f ][ aᴰ , bᴰ ] → Hom[ g ][ aᴰ , bᴰ ]
-    reind p = subst Hom[_][ _ , _ ] p
 
     -- Filler for the above, directly in the reasoning machine
     reind-filler : {a b : C.ob} {f g : C [ a , b ]} (p : f ≡ g)
