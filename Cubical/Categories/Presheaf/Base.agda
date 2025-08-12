@@ -1,6 +1,7 @@
 module Cubical.Categories.Presheaf.Base where
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Structure
 
 open import Cubical.Categories.Category
 open import Cubical.Categories.Functor.Base
@@ -23,8 +24,35 @@ isUnivalentPresheafCategory : {C : Category ℓ ℓ'}
                             → isUnivalent (PresheafCategory C ℓS)
 isUnivalentPresheafCategory = isUnivalentFUNCTOR _ _ isUnivalentSET
 
-open Category
 open Functor
+-- Category-like syntax for presheaves.
+module PresheafNotation {ℓo}{ℓh}
+       {C : Category ℓo ℓh} {ℓp} (P : Presheaf C ℓp)
+       where
+  private
+    module C = Category C
+  p[_] : C.ob → Type ℓp
+  p[ x ] = ⟨ P ⟅ x ⟆ ⟩
+
+  _⋆_ : ∀ {x y} (f : C [ x , y ]) (g : p[ y ]) → p[ x ]
+  f ⋆ g = P .F-hom f g
+
+  ⋆IdL : ∀ {x} (g : p[ x ]) → C.id ⋆ g ≡ g
+  ⋆IdL = funExt⁻ (P .F-id)
+
+  ⋆Assoc : ∀ {x y z} (f : C [ x , y ])(g : C [ y , z ])(h : p[ z ]) →
+    (f C.⋆ g) ⋆ h ≡ f ⋆ (g ⋆ h)
+  ⋆Assoc f g = funExt⁻ (P .F-seq g f)
+
+  ⟨_⟩⋆⟨_⟩ : ∀ {x y} {f f' : C [ x , y ]} {g g' : p[ y ]}
+            → f ≡ f' → g ≡ g' → f ⋆ g ≡ f' ⋆ g'
+  ⟨ f≡f' ⟩⋆⟨ g≡g' ⟩ = cong₂ _⋆_ f≡f' g≡g'
+
+  isSetPsh : ∀ {x} → isSet (p[ x ])
+  isSetPsh {x} = (P ⟅ x ⟆) .snd
+
+
+open Category
 
 action : ∀ (C : Category ℓ ℓ') → (P : Presheaf C ℓS)
        → {a b : C .ob} → C [ a , b ] → fst (P ⟅ b ⟆) → fst (P ⟅ a ⟆)

@@ -23,8 +23,10 @@ module Cubical.Categories.Presheaf.Representable where
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
+open import Cubical.Foundations.Function
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Isomorphism
+open import Cubical.Foundations.Structure
 
 open import Cubical.Data.Sigma
 open import Cubical.HITs.PropositionalTruncation.Base
@@ -84,6 +86,45 @@ module _ {ℓo}{ℓh}{ℓp} (C : Category ℓo ℓh) (P : Presheaf C ℓp) where
       vertex : C .ob
       element : (P ⟅ vertex ⟆) .fst
       universal : isUniversal vertex element
+
+    universalIso : ∀ c → Iso (C [ c , vertex ]) ⟨ P ⟅ c ⟆ ⟩
+    universalIso c = equivToIso (_ , universal c)
+
+    private
+      module P = PresheafNotation P
+      module C = Category C
+    open Iso
+    intro : ∀ {c} → P.p[ c ] → C [ c , vertex ]
+    intro = universalIso _ .inv
+
+    opaque
+      intro⟨_⟩ : ∀ {c} → {f g : P.p[ c ]} → f ≡ g → intro f ≡ intro g
+      intro⟨ p ⟩ = cong intro p
+
+      β : ∀ {c} → {p : P.p[ c ]} → (intro p P.⋆ element) ≡ p
+      β = universalIso _ .rightInv _
+
+      η : ∀ {c} → {f : C [ c , vertex ]} → f ≡ intro (f P.⋆ element)
+      η {f = f} = sym (universalIso _ .leftInv _)
+
+      weak-η : C .id ≡ intro element
+      weak-η = η ∙ intro⟨ P.⋆IdL _ ⟩
+
+      extensionality : ∀ {c} → {f f' : C [ c , vertex ]}
+                     → (f P.⋆ element) ≡ (f' P.⋆ element)
+                     → f ≡ f'
+      extensionality = isoFunInjective (equivToIso (_ , (universal _))) _ _
+
+      intro≡ : ∀ {c} → {p : P.p[ c ]}{f : C [ c , vertex ]}
+        → p ≡ f P.⋆ element
+        → intro p ≡ f
+      intro≡ p≡f*elt = intro⟨ p≡f*elt ⟩ ∙ sym η
+
+      intro-natural : ∀ {c' c} → {p : P.p[ c ]}{f : C [ c' , c ]}
+                    → f C.⋆ intro p ≡ intro (f P.⋆ p)
+      intro-natural = sym $ intro≡
+        ( P.⟨ refl ⟩⋆⟨ sym β ⟩
+        ∙ (sym $ P.⋆Assoc _ _ _))
 
   unquoteDecl UniversalElementIsoΣ =
     declareRecordIsoΣ UniversalElementIsoΣ (quote UniversalElement)
