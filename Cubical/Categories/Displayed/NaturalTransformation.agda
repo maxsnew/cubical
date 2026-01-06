@@ -22,7 +22,8 @@ module _ {C : Category ℓC ℓC'} {D : Category ℓD ℓD'} where
     {Cᴰ : Categoryᴰ C ℓCᴰ ℓCᴰ'} {Dᴰ : Categoryᴰ D ℓDᴰ ℓDᴰ'}
     (Fᴰ : Functorᴰ F Cᴰ Dᴰ) (Gᴰ : Functorᴰ G Cᴰ Dᴰ)
     : Type (ℓ-max ℓC (ℓ-max ℓC' (ℓ-max ℓCᴰ (ℓ-max ℓCᴰ' ℓDᴰ')))) where
-
+    no-eta-equality
+    constructor natTransᴰ
     open Category
     open NatTrans α
     open Functorᴰ

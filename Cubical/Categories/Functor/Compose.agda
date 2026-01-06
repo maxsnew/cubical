@@ -21,8 +21,8 @@ module _ {ℓC ℓC' ℓD ℓD' ℓE ℓE'}
   precomposeF .F-ob G = funcComp G F
   precomposeF .F-hom α .N-ob c = α .N-ob (F .F-ob c)
   precomposeF .F-hom α .N-hom f = α .N-hom (F .F-hom f)
-  precomposeF .F-id = refl
-  precomposeF .F-seq f g = refl
+  precomposeF .F-id = makeNatTransPath refl
+  precomposeF .F-seq f g = makeNatTransPath refl
 
 module _ {ℓC ℓC' ℓD ℓD' ℓE ℓE'}
   (C : Category ℓC ℓC') {D : Category ℓD ℓD'} {E : Category ℓE ℓE'}

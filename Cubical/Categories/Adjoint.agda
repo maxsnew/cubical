@@ -75,21 +75,22 @@ module _ {F : Functor C D} {G : Functor D C} where
   open _⊣_
   open NatTrans
   open TriangleIdentities
-  opositeAdjunction : (F ⊣ G) → ((G ^opF) ⊣ (F ^opF))
-  N-ob (η (opositeAdjunction x)) = N-ob (ε x)
-  N-hom (η (opositeAdjunction x)) f = sym (N-hom (ε x) f)
-  N-ob (ε (opositeAdjunction x)) = N-ob (η x)
-  N-hom (ε (opositeAdjunction x)) f = sym (N-hom (η x) f)
-  Δ₁ (triangleIdentities (opositeAdjunction x)) =
+  oppositeAdjunction : (F ⊣ G) → ((G ^opF) ⊣ (F ^opF))
+  N-ob (η (oppositeAdjunction x)) = N-ob (ε x)
+  N-hom (η (oppositeAdjunction x)) f = sym (N-hom (ε x) f)
+  N-ob (ε (oppositeAdjunction x)) = N-ob (η x)
+  N-hom (ε (oppositeAdjunction x)) f = sym (N-hom (η x) f)
+  Δ₁ (triangleIdentities (oppositeAdjunction x)) =
     Δ₂ (triangleIdentities x)
-  Δ₂ (triangleIdentities (opositeAdjunction x)) =
+  Δ₂ (triangleIdentities (oppositeAdjunction x)) =
    Δ₁ (triangleIdentities x)
 
-  Iso⊣^opF : Iso (F ⊣ G) ((G ^opF) ⊣ (F ^opF))
-  fun Iso⊣^opF = opositeAdjunction
-  inv Iso⊣^opF = _
-  sec Iso⊣^opF _ = refl
-  ret Iso⊣^opF _ = refl
+  -- -- Does anyone actually need this?
+  -- Iso⊣^opF : Iso (F ⊣ G) ((G ^opF) ⊣ (F ^opF))
+  -- fun Iso⊣^opF = oppositeAdjunction
+  -- inv Iso⊣^opF = _
+  -- sec Iso⊣^opF _ = {!!} -- refl
+  -- ret Iso⊣^opF _ = {!!} -- refl
 
 private
   variable
@@ -171,8 +172,8 @@ module AdjointUniqeUpToNatIso where
 
   G≅ᶜG' : G ≅ᶜ G'
   G≅ᶜG' = Iso.inv congNatIso^opFiso
-    (Left.F≅ᶜF' (opositeAdjunction F⊣G')
-                (opositeAdjunction F⊣G))
+    (Left.F≅ᶜF' (oppositeAdjunction F⊣G')
+                (oppositeAdjunction F⊣G))
 
   open NatIso
 

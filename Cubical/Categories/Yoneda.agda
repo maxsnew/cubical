@@ -56,41 +56,20 @@ module _ {C : Category ℓ ℓ'} where
       theIso : Iso natType setType
       theIso .fun = ϕ
       theIso .inv = Ψ
-      theIso .sec x i = F .F-id i x
-      theIso .ret α@(natTrans αo αh) =
-        NatTrans-≡-intro (sym αo≡βo) (symP αh≡βh)
+      theIso .sec = funExt⁻ (F .F-id)
+      theIso .ret α = makeNatTransPath (sym $ αo≡ψϕαo)
         where
-          β = Ψ (ϕ α)
-          βo = β .N-ob
-          βh = β .N-hom
-
           -- equivalence of action on objects follows
           -- from simple equational reasoning using naturality
-          αo≡βo : αo ≡ βo
-          αo≡βo = funExt λ x → funExt λ f
-                → αo x f
+          αo≡ψϕαo : α .N-ob ≡ Ψ (ϕ α) .N-ob
+          αo≡ψϕαo = funExt λ x → funExt λ f
+                → α .N-ob x f
                 -- expand into the bottom left of the naturality diagram
-                ≡[ i ]⟨ αo x (C .⋆IdL f (~ i)) ⟩
-                  αo x (C .id ⋆⟨ C ⟩ f)
-                ≡[ i ]⟨ αh f i (C .id) ⟩ -- apply naturality
-                  (F ⟪ f ⟫) ((αo _) (C .id))
+                ≡[ i ]⟨ α .N-ob x (C .⋆IdL f (~ i)) ⟩
+                  α .N-ob x (C .id ⋆⟨ C ⟩ f)
+                ≡[ i ]⟨ α .N-hom f i (C .id) ⟩ -- apply naturality
+                  (F ⟪ f ⟫) ((α .N-ob _) (C .id))
                 ∎
-
-          -- type aliases for natural transformation
-          NOType = N-ob-Type (C [ c ,-]) F
-          NHType = N-hom-Type (C [ c ,-]) F
-
-          -- equivalence of commutative squares follows from SET being a Category
-          αh≡βh : PathP (λ i → NHType (αo≡βo i)) αh βh -- αh βh
-          αh≡βh = isPropHomP αh βh αo≡βo
-            where
-              isProp-hom : (ϕ : NOType) → isProp (NHType ϕ)
-              isProp-hom γ = isPropImplicitΠ2 λ x y → isPropΠ λ f →
-                isSetHom (SET _)
-                         {x = (C [ c , x ]) , C .isSetHom } {F ⟅ y ⟆} _ _
-
-              isPropHomP : isOfHLevelDep 1 (λ ηo → NHType ηo)
-              isPropHomP = isOfHLevel→isOfHLevelDep 1 λ a → isProp-hom a
 
   -- Naturality of the bijection
 
@@ -148,7 +127,7 @@ module _ {C : Category ℓ ℓ'} where
 
     the-iso : Iso (FUNCTOR (C ^op) (SET ℓ') [ C [-, c ] , F ])
               (FUNCTOR (C ^op) (SET ℓ') [ (C ^op) [ c ,-] , F ])
-    the-iso = iso to fro (λ b → refl) λ a → refl
+    the-iso = iso to fro (λ b → makeNatTransPath refl) λ a → makeNatTransPath refl
 
 -- A more universe-polymorphic Yoneda lemma
 yoneda* : {C : Category ℓ ℓ'}(F : Functor C (SET ℓ''))
@@ -178,8 +157,8 @@ yoneda* {ℓ}{ℓ'}{ℓ''}{C} F c =
   the-iso .fun α .N-hom g = α .N-hom (g .lower)
   the-iso .inv β .N-ob d f = β .N-ob d f
   the-iso .inv β .N-hom g = β .N-hom (lift g)
-  the-iso .sec β = refl
-  the-iso .ret α = refl
+  the-iso .sec β = makeNatTransPath refl
+  the-iso .ret α = makeNatTransPath refl
 
 yonedaᴾ* : {C : Category ℓ ℓ'}(F : Functor (C ^op) (SET ℓ''))
             → (c : Category.ob C)
@@ -204,8 +183,8 @@ yonedaᴾ* {ℓ}{ℓ'}{ℓ''}{C} F c =
   the-iso .fun α .N-hom = α .N-hom
   the-iso .inv β .N-ob = β .N-ob
   the-iso .inv β .N-hom = β .N-hom
-  the-iso .sec = λ b → refl
-  the-iso .ret = λ a → refl
+  the-iso .sec = λ b → makeNatTransPath refl
+  the-iso .ret = λ a → makeNatTransPath refl
 
 -- Yoneda embedding
 -- TODO: probably want to rename/refactor
@@ -253,7 +232,7 @@ module _ {C : Category ℓ ℓ'} where
 
 
   isFullYO : isFull YO
-  isFullYO x y F[f] = ∣ yo-yo-yo _ F[f] , yoIso {x} (yo y) .Iso.ret F[f] ∣₁
+  isFullYO x y F[f] = ∣ yo-yo-yo _ F[f] , makeNatTransPath refl ∙ yoIso {x} (yo y) .Iso.ret F[f]  ∣₁
 
   isFaithfulYO : isFaithful YO
   isFaithfulYO x y f g p i =

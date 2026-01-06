@@ -3,12 +3,15 @@
 module Cubical.Categories.NaturalTransformation.Properties where
 
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Function using (_$_)
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Isomorphism renaming (iso to iIso)
+
 open import Cubical.Data.Sigma
+
 open import Cubical.Categories.Category renaming (isIso to isIsoC)
 open import Cubical.Categories.Functor.Base
 open import Cubical.Categories.Functor.Properties
@@ -51,17 +54,16 @@ module _ {C : Category ℓC ℓC'} {D : Category ℓD ℓD'} where
   module NatTransP where
 
     module _ {F G : Functor C D} where
-
       -- same as Sigma version
       NatTransΣ : Type (ℓ-max (ℓ-max ℓC ℓC') ℓD')
       NatTransΣ = Σ[ ob ∈ ((x : C .ob) → D [(F .F-ob x) , (G .F-ob x)]) ]
                      ({x y : _ } (f : C [ x , y ]) → (F .F-hom f) ⋆ᴰ (ob y) ≡ (ob x) ⋆ᴰ (G .F-hom f))
 
       NatTransIsoΣ : Iso (NatTrans F G) NatTransΣ
-      NatTransIsoΣ .fun (natTrans N-ob N-hom) = N-ob , N-hom
-      NatTransIsoΣ .inv (N-ob , N-hom) = (natTrans N-ob N-hom)
+      NatTransIsoΣ .fun α = α .N-ob , α .N-hom
+      NatTransIsoΣ .inv (N-ob , N-hom) = natTrans N-ob N-hom
       NatTransIsoΣ .sec _ = refl
-      NatTransIsoΣ .ret _ = refl
+      NatTransIsoΣ .ret _ = makeNatTransPath refl
 
       NatTrans≡Σ : NatTrans F G ≡ NatTransΣ
       NatTrans≡Σ = isoToPath NatTransIsoΣ
@@ -82,20 +84,24 @@ module _ {C : Category ℓC ℓC'} {D : Category ℓD ℓD'} where
         βOb = β .N-ob
         αHom = α .N-hom
         βHom = β .N-hom
-      -- path between natural transformations is the same as a pair of paths (between ob and hom)
-      NTPathIsoPathΣ : Iso (α ≡ β)
-                         (Σ[ p ∈ (αOb ≡ βOb) ]
-                              (PathP (λ i → ({x y : _} (f : _) → F ⟪ f ⟫ ⋆ᴰ (p i y) ≡ (p i x) ⋆ᴰ G ⟪ f ⟫))
-                                  αHom
-                                  βHom))
-      NTPathIsoPathΣ .fun p = (λ i → p i .N-ob) , (λ i → p i .N-hom)
-      NTPathIsoPathΣ .inv (po , ph) i = record { N-ob = po i ; N-hom = ph i }
-      NTPathIsoPathΣ .sec pσ = refl
-      NTPathIsoPathΣ .ret p = refl
+      -- -- path between natural transformations is the same as a pair of paths (between ob and hom)
+      -- NTPathIsoPathΣ : Iso (α ≡ β)
+      --                    (Σ[ p ∈ (αOb ≡ βOb) ]
+      --                         (PathP (λ i → ({x y : _} (f : _) → F ⟪ f ⟫ ⋆ᴰ (p i y) ≡ (p i x) ⋆ᴰ G ⟪ f ⟫))
+      --                             αHom
+      --                             βHom))
+      -- NTPathIsoPathΣ .fun p = (λ i → p i .N-ob) , (λ i → p i .N-hom)
+      -- NTPathIsoPathΣ .inv (po , ph) = makeNatTransPath po
+      -- NTPathIsoPathΣ .sec p = {!!}
+      -- NTPathIsoPathΣ .ret p = {!!}
+      -- -- NTPathIsoPathΣ .fun  = 
+      -- -- NTPathIsoPathΣ .inv (po , ph) i = record { N-ob = po i ; N-hom = ph i }
+      -- -- NTPathIsoPathΣ .sec pσ = ? -- refl
+      -- -- NTPathIsoPathΣ .ret p = ? -- refl
 
-      NTPath≃PathΣ = isoToEquiv NTPathIsoPathΣ
+      -- NTPath≃PathΣ = isoToEquiv NTPathIsoPathΣ
 
-      NTPath≡PathΣ = ua NTPath≃PathΣ
+      -- NTPath≡PathΣ = ua NTPath≃PathΣ
 
   module _ where
     open NatTransP
@@ -174,21 +180,26 @@ module _ {B : Category ℓB ℓB'}{C : Category ℓC ℓC'}{D : Category ℓD �
   CAT⋆Assoc F G H .trans .N-hom = idTrans ((H ∘F G) ∘F F) .N-hom
   CAT⋆Assoc F G H .nIso = idNatIso ((H ∘F G) ∘F F) .nIso
 
+_^opNT : {F F' : Functor C D} → (F ⇒ F') → (F' ^opF) ⇒ (F ^opF)
+_^opNT α = natTrans (α .N-ob) (λ f → sym $ α .N-hom f)
 
+_^unOpNT : {F F' : Functor C D} → (F ^opF ⇒ F' ^opF) → F' ⇒ F
+_^unOpNT α = natTrans (α .N-ob) (λ f → sym $ α .N-hom f)
+
+_^opNI : {F F' : Functor C D} → (F ≅ᶜ F') → (F' ^opF) ≅ᶜ (F ^opF)
+_^opNI α = natIso (α .trans ^opNT) λ x → isiso (α .nIso x .inv) (α .nIso x .ret) (α .nIso x .sec) 
+
+_^unOpNI : {F F' : Functor C D} → (F' ^opF) ≅ᶜ (F ^opF) → (F ≅ᶜ F')
+α ^unOpNI = natIso (α .trans ^unOpNT) (λ x → isiso (α .nIso x .inv) (α .nIso x .ret) (α .nIso x .sec) )
 
 ⇒^opFiso : Iso (F ⇒ F') (_^opF {C = C} {D = D} F' ⇒ F ^opF )
-N-ob (fun ⇒^opFiso x) = N-ob x
-N-hom (fun ⇒^opFiso x) f = sym (N-hom x f)
-inv ⇒^opFiso = _
-sec ⇒^opFiso _ = refl
-ret ⇒^opFiso _ = refl
+⇒^opFiso .fun α = α ^opNT
+⇒^opFiso .inv α = α ^unOpNT
+⇒^opFiso .sec α = makeNatTransPath refl
+⇒^opFiso .ret α = makeNatTransPath refl
 
 congNatIso^opFiso : Iso (F ≅ᶜ F') (_^opF  {C = C} {D = D} F'  ≅ᶜ F ^opF )
-trans (fun congNatIso^opFiso x) = Iso.fun ⇒^opFiso (trans x)
-inv (nIso (fun congNatIso^opFiso x) x₁) = _
-sec (nIso (fun congNatIso^opFiso x) x₁) = ret (nIso x x₁)
-ret (nIso (fun congNatIso^opFiso x) x₁) = sec (nIso x x₁)
-inv congNatIso^opFiso = _
-sec congNatIso^opFiso _ = refl
-ret congNatIso^opFiso _ = refl
-
+congNatIso^opFiso .fun α = α ^opNI
+congNatIso^opFiso .inv α = α ^unOpNI
+congNatIso^opFiso .sec α = NatIso≡ refl
+congNatIso^opFiso .ret α = NatIso≡ refl

@@ -33,6 +33,7 @@ module _ {C : Category ℓC ℓC'} {D : Category ℓD ℓD'} where
   N-hom-Type F G ϕ = {x y : C .ob} (f : C [ x , y ]) → (F .F-hom f) ⋆ᴰ (ϕ y) ≡ (ϕ x) ⋆ᴰ (G .F-hom f)
 
   record NatTrans (F G : Functor C D) : Type (ℓ-max (ℓ-max ℓC ℓC') ℓD') where
+    no-eta-equality
     constructor natTrans
     field
       -- components of the natural transformation
@@ -41,6 +42,8 @@ module _ {C : Category ℓC ℓC'} {D : Category ℓD ℓD'} where
       N-hom :  N-hom-Type F G N-ob
 
   record NatIso (F G : Functor C D): Type (ℓ-max (ℓ-max ℓC ℓC') (ℓ-max ℓD ℓD')) where
+    no-eta-equality
+    constructor natIso
     field
       trans : NatTrans F G
     open NatTrans trans
